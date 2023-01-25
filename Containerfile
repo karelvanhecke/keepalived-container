@@ -52,6 +52,7 @@ COPY --from=BUILDER /usr/sbin/keepalived /usr/sbin/keepalived
 COPY --from=BUILDER /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=BUILDER /etc/passwd /etc/passwd
 COPY --from=BUILDER /etc/group /etc/group
-USER keepalived
+COPY --from /usr/share/misc/magic.mgc /usr/share/misc/magic.mgc
+USER keepalived:keepalived
 VOLUME ["/run"]
 ENTRYPOINT ["/usr/sbin/keepalived","-n","-l","-D"]
