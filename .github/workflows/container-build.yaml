@@ -1,0 +1,31 @@
+name: container-build
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    name: Build container
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Buildah build container
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: keepalived
+          tags: ${{ github.ref_name }}
+          containerfiles: |
+            ./Containerfile
+
+      - name: Push image to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/karelvanhecke
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
