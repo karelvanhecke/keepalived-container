@@ -33,6 +33,7 @@ RUN make
 RUN make install
 RUN addgroup -S keepalived && adduser -S keepalived -G keepalived
 RUN setcap "cap_net_admin+ep cap_net_raw+ep cap_net_broadcast+ep" /usr/sbin/keepalived
+RUN mkdir /run/keepalived && chown -R keepalived:keepalived /run/keepalived
 FROM scratch
 COPY --from=BUILDER /usr/lib/libcrypto.so.50 /usr/lib/libcrypto.so.50
 COPY --from=BUILDER /usr/lib/libssl.so.53 /usr/lib/libssl.so.53
@@ -52,7 +53,7 @@ COPY --from=BUILDER /usr/sbin/keepalived /usr/sbin/keepalived
 COPY --from=BUILDER /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=BUILDER /etc/passwd /etc/passwd
 COPY --from=BUILDER /etc/group /etc/group
-COPY --from /usr/share/misc/magic.mgc /usr/share/misc/magic.mgc
-USER keepalived:keepalived
-VOLUME ["/run"]
+COPY --from=BUILDER /usr/share/misc/magic.mgc /usr/share/misc/magic.mgc
+COPY --from=BUILDER --chown=100:101 /run/keepalived /run
+USER 100:101
 ENTRYPOINT ["/usr/sbin/keepalived","-n","-l","-D"]
