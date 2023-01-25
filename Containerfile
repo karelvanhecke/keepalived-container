@@ -14,7 +14,8 @@ pcre2-dev \
 kmod-dev \
 file-dev \
 curl \
-git
+git \
+libcap-utils
 RUN git clone -b v2.2.7 --depth=1 https://github.com/acassen/keepalived.git
 WORKDIR /keepalived
 RUN curl -o libressl-1.patch https://github.com/acassen/keepalived/commit/bbec15d4781670ac1be5e543cb04543f79200e69.patch && \
