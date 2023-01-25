@@ -54,6 +54,6 @@ COPY --from=BUILDER /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifi
 COPY --from=BUILDER /etc/passwd /etc/passwd
 COPY --from=BUILDER /etc/group /etc/group
 COPY --from=BUILDER /usr/share/misc/magic.mgc /usr/share/misc/magic.mgc
-COPY --from=BUILDER --chown=100:101 /run/keepalived /run
+COPY --from=BUILDER --chown=301:301 /run/keepalived /run
 USER 301:301
 ENTRYPOINT ["/usr/sbin/keepalived","-n","-l","-D"]
