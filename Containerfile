@@ -31,7 +31,7 @@ RUN ./configure --prefix=/usr \
 --enable-regex
 RUN make
 RUN make install
-RUN addgroup -S keepalived && adduser -S keepalived -G keepalived
+RUN addgroup -g 301 -S keepalived && adduser -u 301 -S keepalived -G keepalived
 RUN setcap "cap_net_admin+ep cap_net_raw+ep cap_net_broadcast+ep" /usr/sbin/keepalived
 RUN mkdir /run/keepalived && chown -R keepalived:keepalived /run/keepalived
 FROM scratch
@@ -55,5 +55,5 @@ COPY --from=BUILDER /etc/passwd /etc/passwd
 COPY --from=BUILDER /etc/group /etc/group
 COPY --from=BUILDER /usr/share/misc/magic.mgc /usr/share/misc/magic.mgc
 COPY --from=BUILDER --chown=100:101 /run/keepalived /run
-USER 100:101
+USER 301:301
 ENTRYPOINT ["/usr/sbin/keepalived","-n","-l","-D"]
