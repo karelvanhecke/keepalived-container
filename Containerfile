@@ -32,7 +32,7 @@ RUN ./configure --prefix=/usr \
 RUN make
 RUN make install
 RUN addgroup -g 301 -S keepalived && adduser -u 301 -S keepalived -G keepalived
-RUN setcap "cap_net_admin+ep cap_net_raw+ep cap_net_broadcast+ep" /usr/sbin/keepalived
+RUN setcap "cap_net_admin+ep cap_net_raw+ep cap_net_broadcast+ep cap_setgid+ep" /usr/sbin/keepalived
 RUN mkdir /run/keepalived && chown -R keepalived:keepalived /run/keepalived
 FROM scratch
 COPY --from=BUILDER /usr/lib/libcrypto.so.50 /usr/lib/libcrypto.so.50
