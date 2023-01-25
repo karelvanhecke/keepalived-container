@@ -18,10 +18,12 @@ git \
 libcap-utils
 RUN git clone -b v2.2.7 --depth=1 https://github.com/acassen/keepalived.git
 WORKDIR /keepalived
+ADD remove-setgroups.patch /keepalived/remove-setgroups.patch
 RUN curl -o libressl-1.patch https://github.com/acassen/keepalived/commit/bbec15d4781670ac1be5e543cb04543f79200e69.patch && \
 curl -o libressl-2.patch https://github.com/acassen/keepalived/commit/5cb40301f5cd8fbedbb756cd3d838def7293e0bd.patch && \
 git apply libressl-1.patch && \
-git apply libressl-2.patch
+git apply libressl-2.patch && \
+git apply remove-setgroups.patch
 RUN ./build_setup
 RUN ./configure --prefix=/usr \
 --sysconfdir=/etc \
@@ -32,8 +34,9 @@ RUN ./configure --prefix=/usr \
 RUN make
 RUN make install
 RUN addgroup -g 301 -S keepalived && adduser -u 301 -S keepalived -G keepalived
-RUN setcap "cap_net_admin+ep cap_net_raw+ep cap_net_broadcast+ep cap_setgid+ep" /usr/sbin/keepalived
+RUN setcap "cap_net_admin+ep cap_net_raw+ep cap_net_broadcast+ep" /usr/sbin/keepalived
 RUN mkdir /run/keepalived && chown -R keepalived:keepalived /run/keepalived
+RUN mkdir /etc/keepalived/conf.d
 FROM scratch
 COPY --from=BUILDER /usr/lib/libcrypto.so.50 /usr/lib/libcrypto.so.50
 COPY --from=BUILDER /usr/lib/libssl.so.53 /usr/lib/libssl.so.53
@@ -54,6 +57,8 @@ COPY --from=BUILDER /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifi
 COPY --from=BUILDER /etc/passwd /etc/passwd
 COPY --from=BUILDER /etc/group /etc/group
 COPY --from=BUILDER /usr/share/misc/magic.mgc /usr/share/misc/magic.mgc
-COPY --from=BUILDER --chown=301:301 /run/keepalived /run
+COPY --from=BUILDER --chown=301:301 /run/keepalived /run/keepalived
+COPY --from=BUILDER /etc/keepalived/conf.d /etc/keepalived/conf.d
+ADD keepalived.conf /etc/keepalived/keepalived.conf
 USER 301:301
 ENTRYPOINT ["/usr/sbin/keepalived","-n","-l","-D"]
