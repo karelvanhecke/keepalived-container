@@ -32,7 +32,7 @@ RUN ./configure --prefix=/usr \
 RUN make
 RUN make install
 RUN addgroup -S keepalived && adduser -S keepalived -G keepalived
-RUN setcap CAP_NET_ADMIN+ep CAP_NET_RAW+ep CAP_NET_BROADCAST+ep /usr/sbin/keepalived
+RUN setcap "cap_net_admin+ep cap_net_raw+ep cap_net_broadcast+ep" /usr/sbin/keepalived
 FROM scratch
 COPY --from=BUILDER /usr/lib/libcrypto.so.50 /usr/lib/libcrypto.so.50
 COPY --from=BUILDER /usr/lib/libssl.so.53 /usr/lib/libssl.so.53
